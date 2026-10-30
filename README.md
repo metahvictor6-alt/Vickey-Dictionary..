@@ -1,2 +1,2 @@
 # Vickey-Dictionary..
-Get all the meaning at your right 
+Get all the meanings you want at ease.
