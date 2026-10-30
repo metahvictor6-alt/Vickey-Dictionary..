@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#101827">
+<title>Vickey Dictionary</title>
+<style>
+:root{--bg:#0b1220;--panel:#121d2e;--panel2:#18263a;--text:#edf4ff;--muted:#9aabc2;--accent:#70e1c1;--line:#293950;--danger:#ff8d8d}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 15% 0%,#1b3450 0,transparent 35%),var(--bg);color:var(--text);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;min-height:100vh}
+.wrap{max-width:900px;margin:auto;padding:28px 18px 60px}.brand{display:flex;align-items:center;gap:13px;margin-bottom:24px}.logo{width:48px;height:48px;border-radius:15px;background:linear-gradient(135deg,#70e1c1,#54a8ff);display:grid;place-items:center;color:#071522;font-weight:900;font-size:25px}.brand h1{font-size:clamp(25px,5vw,34px);margin:0;letter-spacing:-1px}.brand p{margin:2px 0 0;color:var(--muted);font-size:13px}
+.card{background:rgba(18,29,46,.94);border:1px solid var(--line);border-radius:22px;padding:22px;box-shadow:0 16px 45px #0003}.searchrow{display:flex;gap:10px}.searchrow input{flex:1;min-width:0;background:#0b1524;border:1px solid #34465e;border-radius:13px;padding:15px 16px;color:var(--text);font-size:17px;outline:none}.searchrow input:focus{border-color:var(--accent);box-shadow:0 0 0 3px #70e1c122}button{border:0;border-radius:13px;padding:13px 18px;font-weight:700;cursor:pointer;background:var(--accent);color:#092018;font-size:15px}button:disabled{opacity:.55;cursor:wait}.hint{color:var(--muted);font-size:13px;margin:11px 2px 0}.status{margin-top:16px;color:var(--muted);font-size:13px;min-height:20px}.result{margin-top:20px}.wordtop{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}.word{font-size:clamp(30px,7vw,43px);font-weight:800;letter-spacing:-1px;margin:0;overflow-wrap:anywhere}.phonetic{color:var(--muted);margin-top:2px}.actions{display:flex;gap:8px;flex-wrap:wrap}.secondary{background:#26384f;color:var(--text);padding:9px 12px}.section{border-top:1px solid var(--line);margin-top:20px;padding-top:16px}.section h3{font-size:12px;text-transform:uppercase;letter-spacing:1.3px;color:var(--accent);margin:0 0 10px}.meaning{margin:0 0 14px}.part{color:#8fb4ff;font-size:13px;font-style:italic;margin-bottom:4px}.example{color:#b8c7da;margin:7px 0 0;padding-left:13px;border-left:2px solid #49627e}.syn{display:flex;gap:7px;flex-wrap:wrap}.chip{background:#23364b;border:1px solid #344c66;color:#dceaff;border-radius:99px;padding:5px 10px;font-size:13px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}.mini{background:#101a29;border:1px solid var(--line);border-radius:15px;padding:15px}.mini h3{margin:0 0 8px;font-size:14px}.mini p{margin:0;color:var(--muted);font-size:13px}.footer{text-align:center;color:#73859d;font-size:12px;margin-top:22px}.empty{padding:26px 8px;text-align:center;color:var(--muted)}.error{color:var(--danger)}@media(max-width:600px){.wrap{padding:20px 12px 40px}.card{padding:17px}.searchrow{flex-direction:column}.searchrow button{width:100%}.grid{grid-template-columns:1fr}.wordtop{flex-direction:column}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="brand"><div class="logo">V</div><div><h1>Vickey Dictionary</h1><p>Words, meanings and knowledge — online or offline.</p></div></header>
+  <main class="card">
+    <form id="searchForm" class="searchrow">
+      <input id="wordInput" type="search" placeholder="Enter a word (e.g. knowledge)" autocomplete="off" aria-label="Search for a word" required>
+      <button id="searchBtn" type="submit">Search word</button>
+    </form>
+    <div class="hint">Online: searches a large dictionary. Offline: searches the built-in word list and words saved on this device.</div>
+    <div id="status" class="status" role="status">Ready. Try “computer”, “beautiful” or “resilient”.</div>
+    <div id="result" class="result"><div class="empty">Your definition will appear here.</div></div>
+  </main>
+  <section class="grid">
+    <div class="mini"><h3>★ Saved words</h3><p id="savedCount">0 words saved on this device.</p></div>
+    <div class="mini"><h3>⌁ How it works</h3><p>Uses an online dictionary when connected and a small built-in dictionary when offline.</p></div>
+  </section>
+  <div class="footer">Vickey Dictionary · Free to use · Your saved words stay in this browser</div>
+</div>
+<script>
+const offline = {
+"ability":["The power or skill to do something.","noun","She has the ability to solve difficult problems.","capability, skill, talent"],
+"achieve":["To successfully reach a goal or result.","verb","You can achieve your goals through steady effort.","accomplish, attain, succeed"],
+"beautiful":["Pleasing the senses or mind aesthetically.","adjective","The garden looks beautiful in the morning.","attractive, lovely, pretty"],
+"brave":["Ready to face danger, pain or difficulty; showing courage.","adjective","It was brave of him to speak honestly.","courageous, bold, fearless"],
+"calm":["Peaceful and not showing nervousness, anger or excitement.","adjective","Take a deep breath and remain calm.","peaceful, quiet, composed"],
+"computer":["An electronic device that stores and processes information.","noun","I use a computer to write my assignments.","PC, machine, processor"],
+"confidence":["A feeling of trust in your abilities or in someone or something.","noun","Practice helped her gain confidence.","self-assurance, belief"],
+"create":["To make something new or bring something into existence.","verb","They want to create a useful mobile app.","make, produce, develop"],
+"dictionary":["A book or digital resource that lists words and explains their meanings.","noun","I looked up the word in a dictionary.","lexicon, wordbook"],
+"education":["The process of teaching, learning and gaining knowledge.","noun","Education can open many opportunities.","learning, schooling, instruction"],
+"efficient":["Working well without wasting time, energy or resources.","adjective","This method is more efficient.","effective, productive"],
+"freedom":["The power or right to act, speak or think as one chooses.","noun","Everyone values freedom.","liberty, independence"],
+"friend":["A person whom one knows and likes well.","noun","A good friend supports you.","companion, pal"],
+"honest":["Truthful and sincere; not likely to lie or cheat.","adjective","Always be honest with others.","truthful, sincere"],
+"knowledge":["Information, understanding or skills gained through learning or experience.","noun","Reading is one way to gain knowledge.","understanding, learning, awareness"],
+"learn":["To gain knowledge or skill through study, experience or teaching.","verb","I want to learn programming.","study, discover, master"],
+"mobile":["Able to move or be moved; also relating to mobile phones.","adjective","She uses a mobile phone to study.","portable, movable"],
+"opportunity":["A situation or chance that makes it possible to do something.","noun","The internship is a great opportunity.","chance, opening, possibility"],
+"programming":["The process of writing instructions that a computer can execute.","noun","Programming is used to build software.","coding, software development"],
+"resilient":["Able to recover quickly from difficulties or adapt to change.","adjective","A resilient person keeps going after setbacks.","tough, adaptable, strong"],
+"success":["The achievement of a desired aim or purpose.","noun","Consistency can lead to success.","achievement, victory, accomplishment"],
+"technology":["The use of scientific knowledge to create tools, systems and solutions.","noun","Technology changes how people communicate.","innovation, engineering"],
+"vickey":["A personal name used here as the name of this dictionary app.","proper noun","Vickey Dictionary helps you explore words.","name"],
+"wisdom":["The ability to make good decisions using knowledge and experience.","noun","Wisdom often comes with experience.","insight, judgement, understanding"]
+};
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let currentWord='';
+function getStore(k){try{return JSON.parse(localStorage.getItem(k)||'[]')}catch{return []}}
+function setStatus(t,err=false){$('status').textContent=t;$('status').className='status'+(err?' error':'')}
+function updateSaved(){const n=getStore('vickeySaved').length;$('savedCount').textContent=`${n} word${n===1?'':'s'} saved on this device.`}
+function render(data, source){
+ currentWord=data.word||'';
+ const meanings=data.meanings||[];
+ let body='';
+ meanings.forEach(m=>{
+  body+=`<div class="section"><div class="part">${esc(m.partOfSpeech||'meaning')}</div>`;
+  (m.definitions||[]).forEach(d=>{body+=`<div class="meaning">${esc(d.definition||'')}</div>${d.example?`<div class="example">“${esc(d.example)}”</div>`:''}`});
+  const syn=[...(m.synonyms||[])].slice(0,12);
+  if(syn.length)body+=`<div class="syn">${syn.map(x=>`<span class="chip">${esc(x)}</span>`).join('')}</div>`;
+  body+='</div>';
+ });
+ const saved=getStore('vickeySaved').some(x=>x.toLowerCase()===currentWord.toLowerCase());
+ $('result').innerHTML=`<div class="wordtop"><div><h2 class="word">${esc(data.word)}</h2><div class="phonetic">${esc(data.phonetic||'')}</div></div><div class="actions"><button class="secondary" id="speakBtn" type="button">🔊 Pronounce</button><button class="secondary" id="saveBtn" type="button">${saved?'★ Saved':'☆ Save word'}</button></div></div>${body||'<div class="section">No definitions were provided.</div>'}<div class="hint">Source: ${source}</div>`;
+ $('speakBtn').onclick=()=>{if('speechSynthesis'in window){speechSynthesis.cancel();speechSynthesis.speak(new SpeechSynthesisUtterance(currentWord))}else setStatus('Text-to-speech is not supported in this browser.',true)};
+ $('saveBtn').onclick=()=>{let a=getStore('vickeySaved');const i=a.findIndex(x=>x.toLowerCase()===currentWord.toLowerCase());if(i>=0)a.splice(i,1);else a.unshift(currentWord);localStorage.setItem('vickeySaved',JSON.stringify(a));updateSaved();render(data,source)};
+}
+async function search(word){
+ word=word.trim().toLowerCase();if(!word)return;
+ $('searchBtn').disabled=true;setStatus('Searching…');
+ try{
+  if(navigator.onLine){
+   const r=await fetch('https://api.dictionaryapi.dev/api/v2/entries/en/'+encodeURIComponent(word));
+   if(r.ok){
+    const arr=await r.json(),entry=arr[0];
+    const meanings=entry.meanings.map(m=>({partOfSpeech:m.partOfSpeech,definitions:m.definitions.slice(0,5).map(d=>({definition:d.definition,example:d.example})),synonyms:m.synonyms||[]}));
+    render({word:entry.word,phonetic:entry.phonetic||entry.phonetics?.find(p=>p.text)?.text||'',meanings},'Online dictionary');
+    setStatus('Definition found online.');return;
+   }
+  }
+  const local=offline[word];
+  if(local){
+   render({word,phonetic:'',meanings:[{partOfSpeech:local[1],definitions:[{definition:local[0],example:local[2]}],synonyms:local[3].split(', ')}]},'Built-in offline dictionary');
+   setStatus(navigator.onLine?'No online result; showing offline definition.':'Offline mode — built-in definition shown.');return;
+  }
+  const saved=getStore('vickeySaved');
+  if(saved.some(x=>x.toLowerCase()===word)){
+   $('result').innerHTML=`<div class="empty"><h2>${esc(word)}</h2>This word is saved on this device, but its definition is not stored yet. Connect to the internet and search it to save its meaning for offline use.</div>`;
+   setStatus('Saved word found; definition is not cached.',true);return;
+  }
+  $('result').innerHTML='<div class="empty">No definition found. Check the spelling or connect to the internet and try again.</div>';
+  setStatus('Word not found in the available dictionaries.',true);
+ }catch(e){
+  const local=offline[word];
+  if(local){render({word,meanings:[{partOfSpeech:local[1],definitions:[{definition:local[0],example:local[2]}],synonyms:local[3].split(', ')}]},'Built-in offline dictionary');setStatus('Connection unavailable — offline definition shown.')}
+  else{setStatus('Could not connect. Try a built-in word or check your connection.',true);$('result').innerHTML='<div class="empty">You are offline and this word is not in the built-in dictionary.</div>'}
+ }finally{$('searchBtn').disabled=false}
+}
+$('searchForm').addEventListener('submit',e=>{e.preventDefault();search($('wordInput').value)});
+window.addEventListener('online',()=>setStatus('You are online. Online dictionary search is available.'));
+window.addEventListener('offline',()=>setStatus('You are offline. Built-in words are still available.'));
+updateSaved();
+</script>
+</body>
+</html>
